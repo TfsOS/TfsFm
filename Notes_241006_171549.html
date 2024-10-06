@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFS Radio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .radio {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .message {
+            margin-top: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TFS Radio</h1>
+        <div class="radio">
+            <input type="text" id="frequency" placeholder="Enter Frequency (e.g., 1.5)">
+            <button id="playButton">Play</button>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        // Mapping of frequencies to song links
+        const frequencies = {
+            "1.5": "https://github.com/TfsOS/TfsFm/blob/main/11086_Luis%20Fonsi%20ft.%20Daddy%20Yankee%20-%20Despacito%20SHOW2BABI.COM.mp3", // Replace with actual MP3 URL
+            "2.0": "https://www.example.com/song2.mp3", // Replace with actual MP3 URL
+            "2.5": "https://www.example.com/song3.mp3"  // Replace with actual MP3 URL
+            // Add more frequencies and corresponding song links as needed
+        };
+
+        const playButton = document.getElementById('playButton');
+        const frequencyInput = document.getElementById('frequency');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const message = document.getElementById('message');
+
+        playButton.addEventListener('click', () => {
+            const frequency = frequencyInput.value;
+
+            if (frequencies[frequency]) {
+                audioPlayer.src = frequencies[frequency];
+                audioPlayer.play();
+                message.textContent = `Now playing: ${frequency} TFS Radio`;
+            } else {
+                message.textContent = 'Frequency not found. Please enter a valid frequency.';
+            }
+        });
+    </script>
+</body>
+</html>
