@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fireOs</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #282c34;
+            color: white;
+        }
+
+        /* Background */
+        #background {
+            background-image: url('https://i.postimg.cc/50m21Rxp/JYUIfN.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.8;
+            z-index: -9999;
+        }
+
+        /* Desktop */
+        #desktop {
+            padding-top: 50px; /* Prevents overlap with the taskbar */
+            height: calc(100% - 50px); /* Adjust height for taskbar */
+        }
+
+        .program-button {
+            display: inline-block;
+            width: 120px;
+            height: 50px;
+            background-color: #333;
+            color: white;
+            margin: 10px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-button:hover {
+            background-color: #666;
+            transform: scale(1.05);
+        }
+
+#taskbar {
+    background-color: #333;
+    height: 50px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-between; /* Adjusts space between children */
+    align-items: center; /* Centers items vertically */
+    padding: 0 20px;
+    z-index: 100;
+}
+
+#current-time {
+    margin-left: auto; /* Pushes the time to the right */
+    color: white; /* Optional: change color to match your design */
+}
+
+
+        .taskbar-button {
+            background-color: #555;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .taskbar-button:hover {
+            background-color: #777;
+        }
+
+        /* Menu */
+        #startMenu {
+            display: none; /* Initially hidden */
+            position: absolute;
+            top: 50px; /* Below the taskbar */
+            left: 10px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: menuSlide 0.5s ease forwards;
+        }
+
+        @keyframes menuSlide {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        #startMenu div {
+            padding: 10px;
+            background-color: #444;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        #startMenu div:hover {
+            background-color: #666;
+        }
+
+        /* Windows */
+        .window {
+            width: 600px;
+            min-height: 400px;
+            background-color: #282c34;
+            border: 2px solid #555;
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1;
+            display: none;
+            color: white;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .title-bar {
+            background-color: #444;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            cursor: grab;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .window-content {
+            padding: 20px;
+            background-color: #333;
+            height: calc(100% - 50px);
+            overflow: auto; /* Allow scrolling for large content */
+        }
+
+        /* Window buttons */
+        .close-button, .minimize-button, .maximize-button {
+            cursor: pointer;
+            padding: 5px;
+            border: none;
+            background: #ff5c5c;
+            color: white;
+            border-radius: 50%;
+        }
+
+        .minimize-button {
+            background-color: #ffbd4a;
+        }
+
+        .maximize-button {
+            background-color: #00ca56;
+        }
+
+        /* Code Editor */
+        textarea {
+            background-color: #1e1e1e;
+            color: #dcdcdc;
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            resize: none; /* Disable resizing */
+        }
+
+        /* App Store */
+        .app {
+            padding: 10px;
+            background-color: #555;
+            color: white;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .app:hover {
+            background-color: #666;
+        }
+
+        /* File Explorer */
+        #fileExplorer .file {
+            border: 1px solid #ccc;
+            margin: 5px;
+            padding: 10px;
+            background-color: #555;
+            color: white;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        /* Painting Program */
+        #paintCanvas {
+            background-color: white; /* Set canvas background to white */
+        }
+
+        /* Dialog Box */
+        #dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 200;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #dialog select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 10px;
+        }
+
+        #dialog button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        /* Iframe for output */
+        #outputWindow {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 300;
+        }
+
+        #outputFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Alert Box */
+        #alertBox {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #555;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 200;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+
+    <div id="desktop">
+       
+
+<div id="taskbar">
+    <button class="taskbar-button" onclick="toggleStartMenu()">Start</button>
+    <div id="current-time"></div>
+</div>
+
+
+    <!-- Start Menu -->
+    <div id="startMenu">
+        <div onclick="openWindow('tfsWordWindow')">TFS Word</div>
+        <div onclick="openWindow('paintingProgramWindow')">Painting Program</div>
+        <div onclick="openWindow('advancedFileExplorerWindow')">File Explorer</div>
+        <div onclick="openWindow('fileManagerWindow')">File Manager</div>
+        <div onclick="openWindow('editorWindow')">Code Editor</div>
+        <div onclick="openWindow('tfsBrowserWindow')">TFS Browser</div>
+        <div onclick="openWindow('appStoreWindow')">App Store</div>
+        <div onclick="openWindow('gamesWindow')">Games</div>
+        <div onclick="openWindow('settingsWindow')">Settings</div>
+    </div>
+    <div onclick="openWindow('fileExplorer2Window')>file explorer 2</div>
+
+    <!-- Welcome Window -->
+    <div class="window" id="welcomeWindow">
+        <div class="title-bar">
+            Welcome to FIRE-OS
+            <button class="close-button" onclick="closeWindow('welcomeWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h2>Welcome to TFS OS!</h2>
+            <p>Get started by exploring the applications.</p>
+            <button onclick="closeWindow('welcomeWindow')">OK</button>
+        </div>
+    </div>
+    
+    <!-- File Explorer 2 Window -->
+<div class="window" id="fileExplorer2Window" style="display:none;">
+    <div class="title-bar">
+        File Explorer 2
+        <button class="close-button" onclick="closeWindow('fileExplorer2Window')">X</button>
+    </div>
+    <div class="window-content">
+        <h2>File Explorer 2</h2>
+
+        <!-- User Files Section -->
+        <h3>User Files</h3>
+        <div id="userFiles" class="file-explorer-section">
+            <!-- Populate with user files from localStorage -->
+            <div class="file" onclick="openUserFile('example.txt')">📄 example.txt</div>
+           <button onclick="deleteUserFile('example.txt')">Delete</button>
+    </div>
+            <div class="file" onclick="openUserFile('document.docx')">📄 document.docx</div>
+            nclick="deleteUserFile('document.docx')">Delete</button>
+            <!-- More user files can be added dynamically -->
+        </div>
+
+        <!-- System Files Section -->
+        <h3>System Files (Cannot Access)</h3>
+        <div id="systemFiles" class="file-explorer-section">
+            <div class="file" onclick="showAlert('You cannot access or delete system files.')">📁 system32</div>
+            <div class="file" onclick="showAlert('You cannot access or delete system files.')">📁 config</div>
+            <!-- More system files can be added dynamically -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to open a user file
+    function openUserFile(fileName) {
+        // Functionality to open and display user file content
+        alert(`Opening ${fileName}`);
+    }
+    
+    // Function to show alert messages
+    function showAlert(message) {
+        document.getElementById('alertContent').innerText = message;
+        document.getElementById('alertOkButton').style.display = 'inline';
+        document.getElementById('alertCancelButton').style.display = 'none';
+        document.getElementById('alertBox').style.display = 'block';
+    }
+</script>
+
+<style>
+    .file-explorer-section {
+        margin: 10px 0;
+    }
+    
+    .file {
+        border: 1px solid #ccc;
+        margin: 5px;
+        padding: 10px;
+        background-color: #555;
+        color: white;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    .file:hover {
+        background-color: #666;
+    }
+</style>
+
+<!-- Button for File Explorer 2 -->
+<div class="program-button" onclick="openWindow('fileExplorer2Window')">File Explorer 2</div>
+
+
+    <!-- TFS Word Window -->
+    <div class="window" id="tfsWordWindow">
+        <div class="title-bar">
+            TFS Word
+            <button class="close-button" onclick="checkSaveDocument()">X</button>
+        </div>
+        <div class="window-content">
+            <label>Font:</label>
+            <select id="fontSelect">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <br>
+            <label>Size:</label>
+            <select id="fontSizeSelect">
+                <option value="12">12</option>
+                <option value="14">14</option>
+                <option value="16">16</option>
+            </select>
+            <br>
+            <div>
+                <button onclick="formatText('bold')">Bold</button>
+                <button onclick="formatText('italic')">Italic</button>
+                <button onclick="formatText('underline')">Underline</button>
+                <button onclick="formatText('strikeThrough')">Strike</button>
+                <button onclick="highlightText()">Highlight</button>
+                <button onclick="bulletList()">Bullet List</button>
+                <button onclick="numberedList()">Numbered List</button>
+                <button onclick="increaseIndent()">Increase Indent</button>
+                <button onclick="decreaseIndent()">Decrease Indent</button>
+                <button onclick="checkSaveDocument()">Save</button>
+                <button onclick="loadDocument()">Load</button>
+                <button onclick="openRunDialog()">Run</button>
+            </div>
+            <div contenteditable="true" id="tfsWordEditor" style="border: 1px solid #ccc; min-height: 200px; padding: 10px; margin-top: 10px; background: white; color: black;"></div> <!-- Default text color set to black -->
+        </div>
+    </div>
+
+    <!-- Painting Program Window -->
+    <div class="window" id="paintingProgramWindow">
+        <div class="title-bar">
+            Paint Program
+            <button class="close-button" onclick="closeWindow('paintingProgramWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <canvas id="paintCanvas" width="400" height="300"></canvas>
+            <br>
+            <label for="colorPicker">Color:</label>
+            <input type="color" id="colorPicker" value="#000000">
+            <label for="brushSize">Size:</label>
+            <input type="range" id="brushSize" min="1" max="50" value="5">
+            <button onclick="saveDrawing()">Save Drawing</button>
+            <button onclick="clearCanvas()">Clear</button>
+        </div>
+    </div>
+
+    <!-- File Manager Window -->
+    <div class="window" id="fileManagerWindow">
+        <div class="title-bar">
+            File Manager
+            <button class="close-button" onclick="closeWindow('fileManagerWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h2>File Manager</h2>
+            <div id="fileManager"></div>
+            <input type="file" id="fileInput" multiple onchange="uploadFiles(event)" style="display: none;">
+            <button onclick="document.getElementById('fileInput').click()">Upload Files</button>
+        </div>
+    </div>
+
+    <!-- Advanced File Explorer Window -->
+    <div class="window" id="advancedFileExplorerWindow">
+        <div class="title-bar">
+            Advanced File Explorer
+            <button class="close-button" onclick="closeWindow('advancedFileExplorerWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h2>Advanced File Explorer</h2>
+            <div id="advancedFileExplorer"></div>
+            <button onclick="newFolder()">New Folder</button>
+            <input type="file" id="advancedFileInput" multiple onchange="uploadAdvancedFiles(event)" style="display: none;">
+            <button onclick="document.getElementById('advancedFileInput').click()">Upload Files</button>
+        </div>
+    </div>
+
+    <!-- Code Editor Window -->
+    <div class="window" id="editorWindow">
+        <div class="title-bar">
+            Code Editor
+            <button class="close-button" onclick="closeWindow('editorWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <textarea id="codeEditor" placeholder="Start coding here..." style="width: 100%; height: 300px;"></textarea>
+            <button onclick="saveCode()">Save Code</button>
+            <button onclick="openRunDialog()">Run</button>
+        </div>
+    </div>
+
+    <!-- TFS Browser Window -->
+    <div class="window" id="tfsBrowserWindow">
+        <div class="title-bar">
+            TFS Browser
+            <button class="close-button" onclick="closeWindow('tfsBrowserWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <label for="browserUrl">URL:</label>
+            <input type="text" id="browserUrl" placeholder="Enter URL">
+            <button onclick="loadUrl()">Go</button>
+            <iframe id="browserFrame" style="width: 100%; height: 300px;"></iframe>
+        </div>
+    </div>
+
+    <!-- App Store Window -->
+    <div class="window" id="appStoreWindow">
+        <div class="title-bar">
+            App Store
+            <button class="close-button" onclick="closeWindow('appStoreWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h2>Available Apps</h2>
+            <div class="app" onclick="installApp('Tic Tac Toe')">Tic Tac Toe</div>
+            <div class="app" onclick="installApp('Memory Game')">Memory Game</div>
+            <div class="app" onclick="installApp('Calculator')">Calculator</div>
+            <button onclick="installApp('TFS Word')">Install TFS Word</button>
+            <button onclick="installApp('Painting Program')">Install Painting Program</button>
+        </div>
+    </div>
+
+    <!-- Games Window -->
+    <div class="window" id="gamesWindow">
+        <div class="title-bar">
+            Games
+            <button class="close-button" onclick="closeWindow('gamesWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h2>Available Games</h2>
+            <div class="game" onclick="openTicTacToe()">Tic Tac Toe</div>
+            <div class="game" onclick="openMemoryGame()">Memory Game</div>
+            <div class="game" onclick="openCalculator()">Calculator</div>
+        </div>
+    </div>
+
+    <!-- Settings Window -->
+    <div class="window" id="settingsWindow">
+        <div class="title-bar">
+            Settings
+            <button class="close-button" onclick="closeWindow('settingsWindow')">X</button>
+        </div>
+        <div class="window-content">
+            <h3>Personalization Options</h3>
+            <label for="themeSelect">Choose Theme:</label>
+            <select id="themeSelect">
+                <option value="light">Light Theme</option>
+                <option value="dark">Dark Theme</option>
+            </select>
+            <br>
+            <label for="backgroundInput">Background Image:</label>
+            <input type="file" id="backgroundInput" accept="image/*" onchange="changeBackground(event)">
+            <br>
+            <label for="windowColor">Window Color:</label>
+            <input type="color" id="windowColor" value="#282c34">
+            <br>
+            <label for="borderStyle">Window Border Style:</label>
+            <select id="borderStyle">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+            </select>
+            <br>
+            <label for="windowTransparency">Window Transparency:</label>
+            <input type="range" id="windowTransparency" min="0" max="100" value="100">
+            <br>
+            <label for="fontStyle">Font Style:</label>
+            <select id="fontStyle">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <br>
+            <label for="textSize">Text Size:</label>
+            <input type="number" id="textSize" value="14">
+            <br>
+            <label for="soundEffects">Enable Sound Effects:</label>
+            <input type="checkbox" id="soundEffects">
+            <br>
+            <button onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- Dialog Box for Run -->
+    <div id="dialog" class="window">
+        <div class="title-bar">
+            Run Code
+            <button class="close-button" onclick="closeDialog()">X</button>
+        </div>
+        <div class="window-content">
+            <label for="languageSelect">Select Language:</label>
+            <select id="languageSelect">
+                <option value="html">HTML</option>
+                <option value="js">JavaScript</option>
+            </select>
+            <button onclick="runCode()">Run</button>
+        </div>
+    </div>
+
+    <!-- Output Window -->
+    <div id="outputWindow" style="display:none;">
+        <div class="title-bar">
+            Output
+            <button class="close-button" onclick="closeOutput()">X</button>
+        </div>
+        <iframe id="outputFrame"></iframe>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alertBox" class="window">
+        <div class="title-bar">
+            Alert
+            <button class="close-button" onclick="closeAlert()">X</button>
+        </div>
+        <div class="window-content" id="alertContent"></div>
+        <button id="alertOkButton" onclick="handleAlertOk()">OK</button>
+        <button id="alertCancelButton" onclick="handleAlertCancel()" style="display:none;">Cancel</button>
+    </div>
+
+    <script>
+        let currentWordDocument = null; // Track the current document name
+        const installedApps = new Set(); // Track installed applications
+
+        // Function to open a window by ID
+        function openWindow(windowId) {
+            document.getElementById(windowId).style.display = 'block';
+        }
+
+        // Function to close a window by ID
+        function closeWindow(windowId) {
+            document.getElementById(windowId).style.display = 'none';
+        }
+
+        // Function to check if the document is saved before closing TFS Word
+        function checkSaveDocument() {
+            if (document.getElementById('tfsWordEditor').innerHTML !== "") {
+                showAlert("You have unsaved changes. Do you want to save the document?", true);
+                document.getElementById('alertOkButton').onclick = openSaveDocumentDialog;
+            } else {
+                closeWindow('tfsWordWindow');
+            }
+        }
+
+        // Function to open the save document dialog
+        function openSaveDocumentDialog() {
+            const fileName = prompt("Enter file name for the document:", "Untitled");
+            if (fileName) {
+                const content = document.getElementById('tfsWordEditor').innerHTML;
+                localStorage.setItem(fileName, content);
+                currentWordDocument = fileName; // Store the current document name
+                alert("Document saved as " + fileName);
+            }
+            closeWindow('tfsWordWindow');
+        }
+
+        // Painting Program Functions
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+
+        canvas.addEventListener('mousedown', (e) => {
+            painting = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (painting) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = document.getElementById('colorPicker').value;
+                ctx.lineWidth = document.getElementById('brushSize').value;
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            painting = false;
+        });
+
+        function saveDrawing() {
+            const dataURL = canvas.toDataURL();
+            localStorage.setItem('savedDrawing', dataURL);
+            alert('Drawing saved!');
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // TFS Word Functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function loadDocument() {
+            const fileName = prompt("Enter file name to load:", "Untitled");
+            const content = localStorage.getItem(fileName);
+            if (content) {
+                document.getElementById('tfsWordEditor').innerHTML = content;
+                alert("Document loaded: " + fileName);
+            } else {
+                alert("No document found with that name.");
+            }
+        }
+
+        // Code Editor Functions
+        function saveCode() {
+            const code = document.getElementById('codeEditor').value;
+            localStorage.setItem('savedCode', code);
+            alert('Code saved!');
+        }
+
+        // App Store Functions
+        function installApp(appName) {
+            if (!installedApps.has(appName)) {
+                installedApps.add(appName);
+                alert(`${appName} installed!`);
+                // Create an icon on the desktop
+                const appButton = document.createElement('div');
+                appButton.className = 'program-button';
+                appButton.innerText = appName;
+                appButton.onclick = () => openWindow(appName.replace(' ', '') + 'Window'); // Open the respective window
+                document.getElementById('desktop').appendChild(appButton);
+            } else {
+                alert(`${appName} is already installed!`);
+            }
+        }
+
+        // Load URL in the TFS Browser
+        function loadUrl() {
+            const url = document.getElementById('browserUrl').value;
+            if (url) {
+                document.getElementById('browserFrame').src = url.startsWith('http') ? url : 'http://' + url;
+            }
+        }
+
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+        }
+
+        // Start menu toggle
+        function toggleStartMenu() {
+            const startMenu = document.getElementById('startMenu');
+            startMenu.style.display = startMenu.style.display === 'none' || startMenu.style.display === '' ? 'block' : 'none';
+        }
+
+        // Click outside the menu to close it
+        document.addEventListener('click', (event) => {
+            const startMenu = document.getElementById('startMenu');
+            const startButton = document.querySelector('.taskbar-button');
+            if (!startMenu.contains(event.target) && !startButton.contains(event.target)) {
+                startMenu.style.display = 'none';
+            }
+        });
+
+        // Settings Functions
+        function saveSettings() {
+            const theme = document.getElementById('themeSelect').value;
+            const backgroundImage = document.getElementById('backgroundInput').files[0];
+            const windowColor = document.getElementById('windowColor').value;
+            const borderStyle = document.getElementById('borderStyle').value;
+            const windowTransparency = document.getElementById('windowTransparency').value;
+            const fontStyle = document.getElementById('fontStyle').value;
+            const textSize = document.getElementById('textSize').value;
+            const soundEffects = document.getElementById('soundEffects').checked;
+
+            // Save settings to local storage
+            localStorage.setItem('theme', theme);
+            if (backgroundImage) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    document.body.style.backgroundImage = `url(${reader.result})`;
+                    localStorage.setItem('backgroundImage', reader.result); // Save background image to local storage
+                };
+                reader.readAsDataURL(backgroundImage);
+            }
+            localStorage.setItem('windowColor', windowColor);
+            localStorage.setItem('borderStyle', borderStyle);
+            localStorage.setItem('windowTransparency', windowTransparency);
+            localStorage.setItem('fontStyle', fontStyle);
+            localStorage.setItem('textSize', textSize);
+            localStorage.setItem('soundEffects', soundEffects);
+            alert('Settings saved!');
+        }
+
+        // Change Background Image
+        function changeBackground(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('background').style.backgroundImage = `url(${e.target.result})`;
+                localStorage.setItem('backgroundImage', e.target.result); // Save the image to local storage
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Open Run Dialog
+        function openRunDialog() {
+            document.getElementById('dialog').style.display = 'block';
+        }
+
+        // Close Run Dialog
+        function closeDialog() {
+            document.getElementById('dialog').style.display = 'none';
+        }
+
+        // Run Code
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const language = document.getElementById('languageSelect').value;
+            const outputFrame = document.getElementById('outputFrame');
+            const outputWindow = document.getElementById('outputWindow');
+
+            if (language === 'html') {
+                outputFrame.srcdoc = code; // For HTML code
+            } else if (language === 'js') {
+                outputFrame.srcdoc = `
+                    <html>
+                        <body>
+                            <script>${code}<\/script>
+                        </body>
+                    </html>
+                `; // For JavaScript code
+            }
+
+            outputWindow.style.display = 'block'; // Show output window
+        }
+
+        // Close Output Window
+        function closeOutput() {
+            document.getElementById('outputWindow').style.display = 'none';
+        }
+
+        // Custom Alert Function
+        function showAlert(message, withCancel = false) {
+            document.getElementById('alertContent').innerText = message;
+            document.getElementById('alertOkButton').style.display = 'inline';
+            document.getElementById('alertCancelButton').style.display = withCancel ? 'inline' : 'none';
+            document.getElementById('alertBox').style.display = 'block';
+        }
+
+        // Close Alert Box
+        function closeAlert() {
+            document.getElementById('alertBox').style.display = 'none';
+        }
+
+        // Handle Alert OK
+        function handleAlertOk() {
+            closeAlert();
+            // Add any additional actions for OK button here
+        }
+
+        // Handle Alert Cancel
+        function handleAlertCancel() {
+            closeAlert();
+            // Add any additional actions for Cancel button here
+        }
+
+        // File Explorer Functions
+        function newFolder() {
+            const folderName = prompt("Enter folder name:");
+            if (folderName) {
+                const folderDiv = document.createElement('div');
+                folderDiv.classList.add('file');
+                folderDiv.innerHTML = `📁 ${folderName}`;
+                folderDiv.onclick = () => showAlert('System files cannot be accessed or deleted.');
+                document.getElementById('advancedFileExplorer').appendChild(folderDiv);
+            }
+        }
+
+        function deleteUserFile(fileName) {
+            showAlert(`Are you sure you want to delete ${fileName}?`, true);
+            document.getElementById('alertOkButton').onclick = () => {
+                localStorage.removeItem(fileName);
+                alert(`${fileName} has been deleted.`);
+                closeAlert();
+                // Refresh file explorer here
+            };
+        }
+
+        // Initialize clock
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            openWindow('welcomeWindow'); // Open welcome window on start
+        });
+        
+        // Function to delete a user file
+function deleteUserFile(fileName) {
+    // Show a confirmation alert
+    if (confirm(`Are you sure you want to delete ${fileName}?`)) {
+        // Remove the file from local storage
+        localStorage.removeItem(fileName);
+        alert(`${fileName} has been deleted.`);
+
+        // Refresh the user files display
+        updateUserFiles();
+    }
+}
+
+// Function to update the user files display
+function updateUserFiles() {
+    const userFilesSection = document.getElementById('userFiles');
+    userFilesSection.innerHTML = ''; // Clear existing files
+
+    // Loop through local storage and display user files
+    for (let i = 0; i < localStorage.length; i++) {
+        const fileName = localStorage.key(i);
+        if (!fileName.startsWith("system_")) { // Assuming system files start with "system_"
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'file';
+            fileDiv.innerHTML = `📄 ${fileName} <button onclick="deleteUserFile('${fileName}')">Delete</button>`;
+            userFilesSection.appendChild(fileDiv);
+        }
+    }
+}
+
+    </script>
+</body>
+</html>

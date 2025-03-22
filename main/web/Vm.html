@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFS OS Emulator - Windows 95 Style</title>
+
+    <!-- Link to the 98.css for Windows 95 styling -->
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+
+    <style>
+        body {
+            font-family: "MS Sans Serif", Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #008080; /* Classic Windows 95 teal background */
+        }
+
+        .emulator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .controls .window {
+            width: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
+            border: 2px solid black;
+            background-color: white;
+            margin-top: 20px;
+        }
+
+        .loading {
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Optional: Make sure iframe is hidden before "run" */
+        iframe.hidden {
+            display: none;
+        }
+
+        /* Fullscreen styling */
+        iframe.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="emulator-container">
+    
+    <!-- Controls (OS version selector + Run button) -->
+    <div class="controls">
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">TFS OS Version</div>
+            </div>
+            <div class="window-body">
+                <p>Select TFS OS Version:</p>
+                <select id="select-os" class="dropdown">
+                    <option value="">Choose Version</option>
+                    <option value="https://tfsos.github.io/tfsosv12/">TFS OS 12</option>
+                    <option value="https://tfsos.github.io/tfsosv13/">TFS OS 13</option>
+                    <option value="https://tfsos.github.io/tfsosv14/">TFS OS 14</option>
+                    <option value="https://tfsos.github.io/tfsosv15/">TFS OS 15</option>
+                    <option value="https://tfsos.github.io/tfsosv16/">TFS OS 16 Pre-release</option>
+                    <option value="https://tfsos.github.io/FireOs/">Fire OS v1.0</option> <!-- Fire OS added -->
+                </select>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="title-bar">
+                <div class="title-bar-text">Actions</div>
+            </div>
+            <div class="window-body">
+                <button id="run-button" class="button">Run</button>
+                <div id="loading" class="loading">Loading boot packages...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Larger iframe displayed below the controls -->
+    <iframe id="os-frame" class="hidden"></iframe>
+
+</div>
+
+<script>
+    // Function to toggle full screen
+    function toggleFullscreen(iframe) {
+        if (iframe.classList.contains('fullscreen')) {
+            // Exit fullscreen
+            iframe.classList.remove('fullscreen');
+        } else {
+            // Enter fullscreen
+            iframe.classList.add('fullscreen');
+        }
+    }
+
+    // Listen for the Ctrl + A + B key combination to enter fullscreen
+    document.addEventListener('keydown', function(event) {
+        const iframe = document.getElementById('os-frame');
+        if (event.ctrlKey && event.key === 'a') {
+            // Wait for 'b' after 'a'
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'b') {
+                    toggleFullscreen(iframe);
+                }
+            }, { once: true });
+        }
+    });
+
+    // Listen for the Ctrl + B + A key combination to exit fullscreen
+    document.addEventListener('keydown', function(event) {
+        const iframe = document.getElementById('os-frame');
+        if (event.ctrlKey && event.key === 'b') {
+            // Wait for 'a' after 'b'
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'a') {
+                    toggleFullscreen(iframe);
+                }
+            }, { once: true });
+        }
+    });
+
+    // Run button click event
+    document.getElementById('run-button').addEventListener('click', function () {
+        const selectedOS = document.getElementById('select-os').value;
+        const iframe = document.getElementById('os-frame');
+        const loadingText = document.getElementById('loading');
+
+        if (selectedOS) {
+            // Show loading text and hide iframe during loading
+            loadingText.style.display = 'block';
+            iframe.classList.add('hidden');
+
+            // Simulate a 5-second loading process
+            setTimeout(function () {
+                // Hide loading text and display iframe with the selected OS
+                loadingText.style.display = 'none';
+                iframe.classList.remove('hidden');
+                iframe.src = selectedOS;
+            }, 5000);
+        } else {
+            alert('Please select a TFS OS version');
+        }
+    });
+</script>
+
+</body>
+</html>

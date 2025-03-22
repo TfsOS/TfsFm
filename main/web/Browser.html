@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Browser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #browser-controls {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 5px;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        iframe {
+            width: 100%;
+            height: 90vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="browser-controls">
+        <button id="back">Back</button>
+        <button id="forward">Forward</button>
+        <input type="text" id="url-bar" placeholder="Enter URL or search query...">
+        <button id="go-button">Go</button>
+    </div>
+    <iframe id="browser-frame" src="https://www.google.com"></iframe>
+
+    <script>
+        const urlBar = document.getElementById('url-bar');
+        const browserFrame = document.getElementById('browser-frame');
+        const goButton = document.getElementById('go-button');
+        const backButton = document.getElementById('back');
+        const forwardButton = document.getElementById('forward');
+
+        // Go button click event
+        goButton.addEventListener('click', () => {
+            navigate(urlBar.value);
+        });
+
+        // Handle back navigation
+        backButton.addEventListener('click', () => {
+            browserFrame.contentWindow.history.back();
+        });
+
+        // Handle forward navigation
+        forwardButton.addEventListener('click', () => {
+            browserFrame.contentWindow.history.forward();
+        });
+
+        // Navigate to URL or Google Search
+        function navigate(input) {
+            if (isValidUrl(input)) {
+                browserFrame.src = input.startsWith('http') ? input : 'http://' + input;
+            } else {
+                const searchQuery = input.split(' ').join('+');
+                browserFrame.src = `https://www.google.com/search?q=${searchQuery}`;
+            }
+        }
+
+        // Check if input is a valid URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Handle pressing Enter in the URL bar
+        urlBar.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                navigate(urlBar.value);
+            }
+        });
+    </script>
+</body>
+</html>

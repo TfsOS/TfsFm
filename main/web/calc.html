@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compact Calculator</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .calculator {
+            width: 180px;  /* Reduced size */
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .display {
+            width: 100%;
+            height: 40px;  /* Smaller display */
+            text-align: right;
+            background-color: #333;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;  /* Tighter spacing */
+        }
+
+        .buttons button {
+            padding: 10px;  /* Smaller buttons */
+            font-size: 14px;  /* Smaller font */
+            background-color: #f1f1f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .buttons button:hover {
+            background-color: #ddd;
+        }
+
+        .buttons .operator {
+            background-color: #ffa500;
+            color: white;
+        }
+
+        .buttons .operator:hover {
+            background-color: #ff8c00;
+        }
+
+        .buttons .equal {
+            background-color: #00bfff;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .buttons .equal:hover {
+            background-color: #009acd;
+        }
+
+        .buttons .clear {
+            background-color: #ff6347;
+            color: white;
+        }
+
+        .buttons .clear:hover {
+            background-color: #ff4500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <!-- Display Screen -->
+    <input type="text" class="display" id="display" disabled>
+
+    <!-- Calculator Buttons -->
+    <div class="buttons">
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button onclick="appendToDisplay('7')">7</button>
+        <button onclick="appendToDisplay('8')">8</button>
+        <button onclick="appendToDisplay('9')">9</button>
+        <button class="operator" onclick="appendToDisplay('+')">+</button>
+
+        <button onclick="appendToDisplay('4')">4</button>
+        <button onclick="appendToDisplay('5')">5</button>
+        <button onclick="appendToDisplay('6')">6</button>
+        <button class="operator" onclick="appendToDisplay('-')">-</button>
+
+        <button onclick="appendToDisplay('1')">1</button>
+        <button onclick="appendToDisplay('2')">2</button>
+        <button onclick="appendToDisplay('3')">3</button>
+        <button class="operator" onclick="appendToDisplay('*')">*</button>
+
+        <button onclick="appendToDisplay('0')">0</button>
+        <button onclick="appendToDisplay('.')">.</button>
+        <button class="equal" onclick="calculateResult()">=</button>
+        <button class="operator" onclick="appendToDisplay('/')">/</button>
+    </div>
+</div>
+
+ 
+  
+<script>
+    // Get display element
+    const display = document.getElementById('display');
+
+    // Function to append a number/operator to the display
+    function appendToDisplay(value) {
+        display.value += value;
+    }
+
+    // Function to clear the display
+    function clearDisplay() {
+        display.value = '';
+    }
+
+    // Function to calculate the result
+    function calculateResult() {
+        try {
+            // Evaluate the expression in the display
+            display.value = eval(display.value);
+        } catch (error) {
+            display.value = 'Error';
+        }
+    }
+</script>
+
+</body>
+</html>

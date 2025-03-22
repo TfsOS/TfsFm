@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop File Explorer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .dropzone {
+            border: 2px dashed #ccc;
+            width: 300px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        .dropzone.hover {
+            background-color: #f0f0f0;
+        }
+        .file-list {
+            width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .file-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            position: relative;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .modal-content img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .close {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            right: 10px; /* Position on the right side */
+            transform: translateY(-50%); /* Adjust to center vertically */
+            background: rgba(255, 68, 68, 0.8);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        .close:hover {
+            background: #ff4444;
+        }
+        .upload-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="dropzone" id="dropzone">Drag & Drop Files Here</div>
+    <button class="upload-btn" id="uploadButton">Upload File</button>
+    <input type="file" id="fileInput" accept=".html,.css,.js,.py,image/*" style="display: none;">
+    <div class="file-list" id="fileList"></div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Preview">
+            <button class="close" id="closeModal">X</button>
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const uploadButton = document.getElementById('uploadButton');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const modal = document.getElementById('modal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+
+        // Load files from localStorage
+        document.addEventListener('DOMContentLoaded', loadFiles);
+
+        // Handle drag and drop events
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('hover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('hover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('hover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        // Handle file input change event
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                saveFile(files[i]);
+            }
+        }
+
+        function saveFile(file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const fileData = {
+                    name: file.name,
+                    url: file.type.startsWith('image/') ? event.target.result : '', // Store image URL
+                    type: file.type // Store file type
+                };
+                let files = JSON.parse(localStorage.getItem('files')) || [];
+                files.push(fileData);
+                localStorage.setItem('files', JSON.stringify(files));
+                loadFiles();
+            };
+            if (file.type.startsWith('image/')) {
+                reader.readAsDataURL(file); // Read image files as data URLs
+            } else {
+                reader.readAsText(file); // Read other file types as text
+            }
+        }
+
+        function loadFiles() {
+            const files = JSON.parse(localStorage.getItem('files')) || [];
+            fileList.innerHTML = '';
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+
+                // Display images with preview option
+                if (file.url) {
+                    fileItem.innerHTML = `
+                        <img src="${file.url}" alt="${file.name}" onclick="openModal('${file.url}')">
+                        <button onclick="deleteFile(${index})">Delete</button>
+                    `;
+                } else {
+                    // For non-image files
+                    fileItem.innerHTML = `
+                        <span>${file.name} (${file.type})</span>
+                        <button onclick="deleteFile(${index})">Delete</button>
+                    `;
+                }
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function deleteFile(index) {
+            let files = JSON.parse(localStorage.getItem('files')) || [];
+            files.splice(index, 1);
+            localStorage.setItem('files', JSON.stringify(files));
+            loadFiles();
+        }
+
+        function openModal(url) {
+            modalImage.src = url;
+            modal.style.display = 'flex';
+        }
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

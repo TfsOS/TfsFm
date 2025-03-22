@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Terminal</title>
+    <style>
+        body {
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: #ffffff;
+        }
+
+        .terminal {
+            width: 600px;
+            height: 400px;
+            background-color: #1d1f21;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output {
+            flex-grow: 1;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+        }
+
+        .prompt {
+            color: #00ff00;
+            margin-right: 10px;
+        }
+
+        .input {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input::placeholder {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal" id="terminal">
+    <div class="output" id="output"></div>
+    <div class="input-area">
+        <span class="prompt">USER > </span>
+        <input type="text" id="input" class="input" autofocus placeholder="Type a command...">
+    </div>
+</div>
+
+<script>
+    const terminalOutput = document.getElementById('output');
+    const terminalInput = document.getElementById('input');
+    
+    const commands = {
+        help: "Available commands: help, clear, echo [message], time, date, about, calc [expression], color [color], greet [name], exit",
+        clear: function() {
+            terminalOutput.innerHTML = '';
+        },
+        echo: function(args) {
+            return args.join(' ');
+        },
+        time: function() {
+            return new Date().toLocaleTimeString();
+        },
+        date: function() {
+            return new Date().toLocaleDateString();
+        },
+        about: "TFS OS Terminal Emulator - Version 1.0",
+        calc: function(args) {
+            try {
+                return eval(args.join(' '));
+            } catch {
+                return "Error: Invalid expression.";
+            }
+        },
+        color: function(args) {
+            document.body.style.backgroundColor = args[0] || "#282c34";
+            return "Background color changed to " + args[0];
+        },
+        greet: function(args) {
+            return `Hello, ${args[0] || "user"}!`;
+        },
+        exit: function() {
+            terminalOutput.innerHTML = 'Exiting the terminal...';
+            setTimeout(() => commands.clear(), 2000);
+        }
+    };
+
+    terminalInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const input = terminalInput.value.trim();
+            processCommand(input);
+            terminalInput.value = '';
+        }
+    });
+
+    function processCommand(input) {
+        if (!input) return;
+
+        const [command, ...args] = input.split(' ');
+
+        let result = '';
+        if (commands[command]) {
+            result = typeof commands[command] === 'function' ? commands[command](args) : commands[command];
+        } else {
+            result = `Unknown command: ${command}. Type "help" for available commands.`;
+        }
+
+        appendOutput(`TFSOS > ${input}\n${result}\n`);
+    }
+
+    function appendOutput(text) {
+        terminalOutput.innerHTML += text;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    // Print the welcome message
+    appendOutput("Welcome to TFS OS Terminal!\nType 'help' for a list of commands.\n");
+</script>
+
+</body>
+</html>

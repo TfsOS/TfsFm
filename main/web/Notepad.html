@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #toolbar {
+            margin-bottom: 10px;
+        }
+        button, select {
+            margin-right: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Notepad</h1>
+    <div id="toolbar">
+        <button onclick="formatText('bold')">Bold</button>
+        <button onclick="formatText('italic')">Italic</button>
+        <button onclick="formatText('underline')">Underline</button>
+        
+        <select id="fontSize" onchange="setFontSize()">
+            <option value="16">Font Size</option>
+            <option value="12">12px</option>
+            <option value="14">14px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+        </select>
+        
+        <select id="fontType" onchange="setFontType()">
+            <option value="Arial">Font Type</option>
+            <option value="Arial">Arial</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+
+        <button onclick="saveDocument()">Save</button>
+        <button onclick="loadDocument()">Load</button>
+    </div>
+
+    <textarea id="editor"></textarea>
+
+    <script>
+        function formatText(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function setFontSize() {
+            let size = document.getElementById('fontSize').value;
+            document.getElementById('editor').style.fontSize = size + 'px';
+        }
+
+        function setFontType() {
+            let type = document.getElementById('fontType').value;
+            document.getElementById('editor').style.fontFamily = type;
+        }
+
+        function saveDocument() {
+            let docName = prompt("Save as (enter document name):");
+            if (docName) {
+                let content = document.getElementById('editor').value;
+                localStorage.setItem(docName, content);
+                alert("Document saved as " + docName);
+            }
+        }
+
+        function loadDocument() {
+            let docName = prompt("Open document (enter document name):");
+            if (docName) {
+                let content = localStorage.getItem(docName);
+                if (content !== null) {
+                    document.getElementById('editor').value = content;
+                    alert("Document " + docName + " loaded.");
+                } else {
+                    alert("No document found with the name " + docName);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

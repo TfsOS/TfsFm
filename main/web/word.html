@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Tfs Wording</title>
+  <style>
+        .text-formatting {
+            margin-bottom: 10px;
+        }
+        .text-formatting button {
+            margin-right: 10px;
+        }
+        .text-formatting select {
+            margin-right: 10px;
+        }
+        #wordContent {
+            min-height: 200px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+  button {
+            background-color: #005FB9; /* Dark gray button */
+            color: #ffffff; /* White text color */
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #4F4F4F; /* Darker gray on hover */
+        }
+    #wordContent {
+    border: 5px solid black; /* Default border color */
+    padding: 10px;
+    min-height: 300px;
+}
+  </style>
+</head>
+<body>
+  <div class="text-formatting">
+    <!-- Existing buttons -->
+    <button onclick="toggleBold()">Bold</button>
+    <button onclick="toggleItalic()">Italic</button>
+    <button onclick="toggleUnderline()">Underline</button>
+    <!-- New buttons -->
+    <button onclick="toggleOverline()">Overline</button>
+    <button onclick="toggleDottedUnderline()">Dotted Underline</button>
+    <button onclick="toggleDoubleUnderline()">Double Underline</button>
+    <button onclick="toggleDashUnderline()">Dash Underline</button>
+    <input type="color" id="underlineColorInput" onchange="changeUnderlineColor()">
+    <button onclick="openThesaurus()">Thesaurus</button>
+    <button onclick="findReplace()">Find & Replace</button>
+    <button onclick="insertPageBreak()">Page Break</button>
+    <button onclick="formatColumns()">Columns</button>
+    <!-- Existing select and input elements -->
+    <select id="fontSelect" onchange="changeFont()">
+        <option value="Arial">Arial</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Verdana">Verdana</option>
+    </select>
+    <select id="fontSizeSelect" onchange="changeFontSize()">
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+    </select>
+    <input type="color" id="fontColorInput" onchange="changeFontColor()">
+    <input type="color" id="highlightColorInput" onchange="changeHighlightColor()">
+    <button onclick="alignLeft()">Left</button>
+    <button onclick="alignCenter()">Center</button>
+    <button onclick="alignRight()">Right</button>
+    <button onclick="applyHeading()">Heading</button>
+    <button onclick="applyParagraph()">Paragraph</button>
+    <button onclick="saveTfsDoc()">Save</button>
+    <button onclick="loadDocument()">Load</button>
+    <button onclick="insertBulletList()">Bullet List</button>
+    <button onclick="insertNumberedList()">Numbered List</button>
+    <button onclick="increaseIndent()">Increase Indent</button>
+    <button onclick="decreaseIndent()">Decrease Indent</button>
+    <button onclick="changeParagraphSpacing()">Paragraph Spacing</button>
+    <button onclick="addHeader()">Header</button>
+    <button onclick="addFooter()">Footer</button>
+
+    
+    <!-- Button to insert a table -->
+    <button onclick="insertTable()">Insert Table</button>
+
+    <!-- Button to insert an image -->
+    <button onclick="insertImage()">Insert Image</button>
+
+    <!-- Button to change the background color -->
+    <button onclick="setBackgroundColor()">Set Background Color</button>
+
+    <!-- Button to save document with name -->
+    <button onclick="saveDocument()">Save Document</button>
+
+    <!-- Button to load document by name -->
+    <button onclick="loadDocument()">Load Document</button>
+<button onclick="setPageBorderColor()">Set Page Border Color</button>
+<button onclick="insertShape()">Insert Shape</button>
+<button onclick="insertFootnote()">Insert Footnote</button>
+<button onclick="insertEndnote()">Insert Endnote</button>
+<button onclick="exportAsTXT()">Export as TXT</button>
+
+
+</div>
+<div>
+    <input type="text" id="thesaurusInput" placeholder="Enter a word">
+    <button onclick="lookupThesaurus()">Lookup Thesaurus</button>
+    <div id="thesaurusResults"></div>
+</div>
+<div contenteditable="true" id="wordContent">
+    Start typing here...
+</div>
+                </div>
+</div>
+  
+<script>
+function toggleBold() {
+            document.execCommand('bold');
+        }
+
+        function toggleItalic() {
+            document.execCommand('italic');
+        }
+
+        function toggleUnderline() {
+            document.execCommand('underline');
+        }
+
+        function toggleStrikethrough() {
+            document.execCommand('strikethrough');
+        }
+
+        function toggleSuperscript() {
+            document.execCommand('superscript');
+        }
+
+        function toggleSubscript() {
+            document.execCommand('subscript');
+        }
+       
+        function changeFont() {
+            let font = document.getElementById('fontSelect').value;
+            document.execCommand('fontName', false, font);
+        }
+
+        function changeFontSize() {
+            let size = document.getElementById('fontSizeSelect').value;
+            document.execCommand('fontSize', false, size);
+        }
+
+        function changeFontColor() {
+            let color = document.getElementById('fontColorInput').value;
+            document.execCommand('foreColor', false, color);
+        }
+
+        function changeHighlightColor() {
+            let color = document.getElementById('highlightColorInput').value;
+            document.execCommand('hiliteColor', false, color);
+        }
+
+        function alignLeft() {
+            document.execCommand('justifyLeft');
+        }
+
+        function alignCenter() {
+            document.execCommand('justifyCenter');
+        }
+
+        function alignRight() {
+            document.execCommand('justifyRight');
+        }
+
+        function applyHeading() {
+            document.execCommand('formatBlock', false, 'h1');
+        }
+
+        function applyParagraph() {
+            document.execCommand('formatBlock', false, 'p');
+        }
+
+        function saveDocument() {
+            let content = document.getElementById('wordContent').innerHTML;
+            localStorage.setItem('savedDocument', content);
+        }
+
+        function loadDocument() {
+            let savedContent = localStorage.getItem('savedDocument');
+            if (savedContent) {
+                document.getElementById('wordContent').innerHTML = savedContent;
+            }
+        }
+
+        function insertBulletList() {
+            document.execCommand('insertUnorderedList');
+        }
+
+        function insertNumberedList() {
+            document.execCommand('insertOrderedList');
+        }
+
+        function increaseIndent() {
+            document.execCommand('indent');
+        }
+
+        function decreaseIndent() {
+            document.execCommand('outdent');
+        }
+
+        function changeParagraphSpacing() {
+            let spacing = prompt("Enter paragraph spacing (in pixels):", "10");
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('formatBlock', false, 'p');
+            let paragraphs = document.getElementById('wordContent').getElementsByTagName('p');
+            for (let p of paragraphs) {
+                p.style.marginBottom = `${spacing}px`;
+            }
+        }
+
+        function addHeader() {
+            let headerText = prompt("Enter header text:", "Header");
+            let header = document.createElement('header');
+            header.innerText = headerText;
+            document.getElementById('wordContent').prepend(header);
+
+        }
+        function addFooter() {
+            let footerText = prompt("Enter footer text:", "Footer");
+            let footer = document.createElement('footer');
+            footer.innerText = footerText;
+            document.getElementById('wordContent').appendChild(footer);
+        }
+function toggleOverline() {
+    document.execCommand('underline', false, null);
+    const content = document.getElementById('wordContent');
+    content.style.textDecoration = content.style.textDecoration.includes('overline') ? 'none' : 'overline';
+}
+
+function toggleDottedUnderline() {
+    const content = document.getElementById('wordContent');
+    content.style.textDecoration = content.style.textDecoration.includes('underline dotted') ? 'none' : 'underline dotted';
+}
+
+function toggleDoubleUnderline() {
+    const content = document.getElementById('wordContent');
+    content.style.textDecoration = content.style.textDecoration.includes('underline double') ? 'none' : 'underline double';
+}
+
+function toggleDashUnderline() {
+    const content = document.getElementById('wordContent');
+    content.style.textDecoration = content.style.textDecoration.includes('underline dashed') ? 'none' : 'underline dashed';
+}
+
+function changeUnderlineColor() {
+    const color = document.getElementById('underlineColorInput').value;
+    const content = document.getElementById('wordContent');
+    content.style.textDecorationColor = color;
+}
+
+function findReplace() {
+    const findText = prompt('Enter the text to find:');
+    const replaceText = prompt('Enter the replacement text:');
+    const content = document.getElementById('wordContent');
+    content.innerHTML = content.innerHTML.replace(new RegExp(findText, 'g'), replaceText);
+}
+
+function insertPageBreak() {
+    const content = document.getElementById('wordContent');
+    content.innerHTML += '<hr style="page-break-after: always;">';
+}
+
+function formatColumns() {
+    const columns = prompt('Enter the number of columns:');
+    const content = document.getElementById('wordContent');
+    content.style.columnCount = columns;
+}
+
+
+function findReplace() {
+    const findText = prompt('Enter the text to find:');
+    const replaceText = prompt('Enter the replacement text:');
+    const content = document.getElementById('wordContent');
+    content.innerHTML = content.innerHTML.replace(new RegExp(findText, 'g'), replaceText);
+}
+
+function insertPageBreak() {
+    const content = document.getElementById('wordContent');
+    content.innerHTML += '<hr style="page-break-after: always;">';
+}
+
+function formatColumns() {
+    const columns = prompt('Enter the number of columns:');
+    const content = document.getElementById('wordContent');
+    content.style.columnCount = columns;
+}
+function insertTable() {
+    const rows = prompt("Enter the number of rows:", "3");
+    const cols = prompt("Enter the number of columns:", "3");
+    let tableHTML = "<table border='1'>";
+    for (let i = 0; i < rows; i++) {
+        tableHTML += "<tr>";
+        for (let j = 0; j < cols; j++) {
+            tableHTML += "<td>Cell</td>";
+        }
+        tableHTML += "</tr>";
+    }
+    tableHTML += "</table>";
+    document.getElementById('wordContent').innerHTML += tableHTML;
+}
+function insertImage() {
+    const imageUrl = prompt("Enter the image URL:");
+    if (imageUrl) {
+        document.execCommand("insertImage", false, imageUrl);
+    }
+}
+function setBackgroundColor() {
+    const color = prompt("Enter background color (e.g., 'lightblue' or '#f0f0f0'):");
+    if (color) {
+        document.getElementById('wordContent').style.backgroundColor = color;
+    }
+}
+function saveDocument() {
+    const name = prompt("Enter the name to save the document as:");
+    if (name) {
+        const content = document.getElementById('wordContent').innerHTML;
+        localStorage.setItem(name, content);
+        alert(`Document saved as "${name}".`);
+    }
+}
+
+function loadDocument() {
+    const name = prompt("Enter the name of the document to load:");
+    const content = localStorage.getItem(name);
+    if (content) {
+        document.getElementById('wordContent').innerHTML = content;
+        alert(`Document "${name}" loaded.`);
+    } else {
+        alert("Document not found.");
+    }
+}
+/* JavaScript function to change border color */
+function setPageBorderColor() {
+    const color = prompt("Enter border color (e.g., 'blue' or '#ff0000'):");
+    if (color) {
+        document.getElementById('wordContent').style.borderColor = color;
+    }
+}
+function insertShape() {
+    const shapeType = prompt("Enter shape type (e.g., 'rectangle' or 'circle'):");
+    const color = prompt("Enter shape color (e.g., 'red' or '#00ff00'):");
+    const shape = document.createElement("div");
+
+    shape.style.backgroundColor = color;
+    shape.style.margin = "10px";
+
+    if (shapeType === "rectangle") {
+        shape.style.width = "100px";
+        shape.style.height = "50px";
+    } else if (shapeType === "circle") {
+        shape.style.width = "50px";
+        shape.style.height = "50px";
+        shape.style.borderRadius = "50%";
+    }
+
+    document.getElementById('wordContent').appendChild(shape);
+}
+function insertFootnote() {
+    const footnoteText = prompt("Enter footnote text:");
+    const footnote = document.createElement("div");
+    
+    footnote.innerHTML = `<sup>*</sup> ${footnoteText}`;
+    footnote.style.fontSize = "12px";
+    footnote.style.color = "gray";
+    footnote.className = "footnote";
+    
+    // Append footnote to the bottom of the wordContent area
+    document.getElementById('wordContent').appendChild(footnote);
+}
+function insertEndnote() {
+    const endnoteText = prompt("Enter endnote text:");
+    const endnote = document.createElement("div");
+    
+    endnote.innerHTML = `<sup>*</sup> ${endnoteText}`;
+    endnote.style.fontSize = "12px";
+    endnote.style.color = "gray";
+    endnote.className = "endnote";
+    
+    // Append endnote to the end of the content
+    document.getElementById('wordContent').appendChild(endnote);
+}
+function exportAsTXT() {
+    const content = document.getElementById('wordContent').innerText;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const link = document.createElement('a');
+    
+    link.href = URL.createObjectURL(blob);
+    link.download = "document.txt";
+    link.click();
+    console.log("exporting")
+    
+    // Clean up the URL object after download
+    URL.revokeObjectURL(link.href);
+}
+
+
+</script>
+</body>
+</html>

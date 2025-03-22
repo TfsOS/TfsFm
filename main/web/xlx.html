@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel-Like Application</title>
+  <style>
+    /* Basic styles for the toolbar and grid */
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+    .toolbar { display: flex; gap: 10px; margin: 10px; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: repeat(10, 100px); grid-template-rows: repeat(10, 30px); border: 1px solid #ccc; }
+    .cell { border: 1px solid #ccc; padding: 5px; font-size: 14px; }
+    .cell[contenteditable="true"] { outline: none; }
+    .btn { padding: 5px 10px; cursor: pointer; }
+    .active { background-color: #ddd; }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar for Formatting Options -->
+  <div class="toolbar">
+    <button class="btn" onclick="format('bold')">Bold</button>
+    <button class="btn" onclick="format('italic')">Italic</button>
+    <button class="btn" onclick="format('underline')">Underline</button>
+    <button class="btn" onclick="format('strikethrough')">Strikethrough</button>
+    <button class="btn" onclick="format('superscript')">Superscript</button>
+    <button class="btn" onclick="format('subscript')">Subscript</button>
+    <button class="btn" onclick="changeFontSize()">Font Size</button>
+    <button class="btn" onclick="changeFontColor()">Font Color</button>
+    <button class="btn" onclick="changeFontFamily()">Font Type</button>
+    <button class="btn" onclick="changeHighlightColor()">Highlight Color</button>
+    <button class="btn" onclick="applyNumbering()">Numbering</button>
+    <button class="btn" onclick="applyBulletList()">Bullet List</button>
+    <button class="btn" onclick="changeBgColor()">Background Color</button>
+    <button class="btn" onclick="addRow()">Add Row</button>
+    <button class="btn" onclick="addColumn()">Add Column</button>
+    <input type="text" id="fileName" placeholder="File Name" />
+    <button class="btn" onclick="saveFile()">Save</button>
+    <button class="btn" onclick="loadFile()">Load</button>
+  </div>
+
+  <!-- Grid (Excel-Like Cells) -->
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    let selectedCell = null;
+
+    // Initialize a 10x10 grid
+    function initGrid(rows = 10, cols = 10) {
+      grid.innerHTML = '';
+      grid.style.gridTemplateColumns = `repeat(${cols}, 100px)`;
+      grid.style.gridTemplateRows = `repeat(${rows}, 30px)`;
+      for (let i = 0; i < rows * cols; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.contentEditable = true;
+        cell.addEventListener('click', () => selectCell(cell));
+        grid.appendChild(cell);
+      }
+    }
+
+    // Select a cell
+    function selectCell(cell) {
+      if (selectedCell) selectedCell.classList.remove('active');
+      selectedCell = cell;
+      selectedCell.classList.add('active');
+    }
+
+    // Text formatting
+    function format(action) {
+      if (selectedCell) {
+        document.execCommand(action, false, null);
+      }
+    }
+
+    // Change font size of the selected cell
+    function changeFontSize() {
+      if (selectedCell) {
+        const size = prompt("Enter font size (e.g., '14px'):");
+        if (size) selectedCell.style.fontSize = size;
+      }
+    }
+
+    // Change font color of the selected cell
+    function changeFontColor() {
+      if (selectedCell) {
+        const color = prompt("Enter font color (e.g., 'red' or '#ff0000'):");
+        if (color) selectedCell.style.color = color;
+      }
+    }
+
+    // Change font type (family) of the selected cell
+    function changeFontFamily() {
+      if (selectedCell) {
+        const font = prompt("Enter font type (e.g., 'Arial', 'Courier New'):");
+        if (font) selectedCell.style.fontFamily = font;
+      }
+    }
+
+    // Change highlight color (background color) of the selected cell
+    function changeHighlightColor() {
+      if (selectedCell) {
+        const color = prompt("Enter highlight color (e.g., 'yellow' or '#ffff00'):");
+        if (color) selectedCell.style.backgroundColor = color;
+      }
+    }
+
+    // Apply numbering to the selected cell
+    function applyNumbering() {
+      if (selectedCell) {
+        selectedCell.innerHTML = '<ol><li>Item 1</li><li>Item 2</li><li>Item 3</li></ol>';
+      }
+    }
+
+    // Apply bullet list to the selected cell
+    function applyBulletList() {
+      if (selectedCell) {
+        selectedCell.innerHTML = '<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>';
+      }
+    }
+
+    // Change background color of the selected cell
+    function changeBgColor() {
+      if (selectedCell) {
+        const color = prompt("Enter a color (e.g., 'lightblue' or '#f0f8ff'):");
+        if (color) selectedCell.style.backgroundColor = color;
+      }
+    }
+
+    // Add a new row
+    function addRow() {
+      const cols = grid.style.gridTemplateColumns.split(' ').length;
+      grid.style.gridTemplateRows += ' 30px';
+      for (let i = 0; i < cols; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.contentEditable = true;
+        cell.addEventListener('click', () => selectCell(cell));
+        grid.appendChild(cell);
+      }
+    }
+
+    // Add a new column
+    function addColumn() {
+      const rows = grid.style.gridTemplateRows.split(' ').length;
+      grid.style.gridTemplateColumns += ' 100px';
+      for (let i = 0; i < rows; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.contentEditable = true;
+        cell.addEventListener('click', () => selectCell(cell));
+        grid.appendChild(cell, i * rows + rows);
+      }
+    }
+
+    // Save grid data to local storage
+    function saveFile() {
+      const fileName = document.getElementById('fileName').value;
+      if (!fileName) {
+        alert("Please enter a file name.");
+        return;
+      }
+      const cells = Array.from(grid.getElementsByClassName('cell'));
+      const cellData = cells.map(cell => ({
+        text: cell.innerHTML,
+        bgColor: cell.style.backgroundColor || '',
+        color: cell.style.color || '',
+        fontFamily: cell.style.fontFamily || '',
+        fontSize: cell.style.fontSize || ''
+      }));
+      localStorage.setItem(fileName, JSON.stringify(cellData));
+      alert("File saved.");
+    }
+
+    // Load grid data from local storage
+    function loadFile() {
+      const fileName = document.getElementById('fileName').value;
+      if (!fileName) {
+        alert("Please enter a file name.");
+        return;
+      }
+      const cellData = JSON.parse(localStorage.getItem(fileName));
+      if (!cellData) {
+        alert("File not found.");
+        return;
+      }
+      const cells = Array.from(grid.getElementsByClassName('cell'));
+      cells.forEach((cell, index) => {
+        cell.innerHTML = cellData[index].text;
+        cell.style.backgroundColor = cellData[index].bgColor;
+        cell.style.color = cellData[index].color;
+        cell.style.fontFamily = cellData[index].fontFamily;
+        cell.style.fontSize = cellData[index].fontSize;
+      });
+      alert("File loaded.");
+    }
+
+    // Initialize grid on load
+    initGrid();
+  </script>
+
+</body>
+</html>
